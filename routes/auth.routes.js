@@ -4,10 +4,16 @@ import {
   register,
   logout,
   currentUser,
-  sendTestEmail,
+  forgotPassword,
+  resetPassword,
 } from '../controllers/auth.controllers';
 import { requireSignIn } from '../middlewares';
-import { validateLogin, validateRegister } from '../validators/auth.validator';
+import {
+  validateForgotPassword,
+  validateLogin,
+  validateRegister,
+  validateResetPassword,
+} from '../validators/auth.validator';
 
 const router = express.Router();
 
@@ -15,6 +21,7 @@ router.post('/register', validateRegister, register);
 router.post('/login', validateLogin, login);
 router.get('/logout', logout);
 router.get('/current-user', requireSignIn, currentUser);
-router.get('/send-email', sendTestEmail);
+router.post('/forgot-password', validateForgotPassword, forgotPassword);
+router.post('/reset-password', validateResetPassword, resetPassword);
 
 module.exports = router;

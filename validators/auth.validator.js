@@ -26,3 +26,23 @@ export const validateLogin = [
     })
     .withMessage('Password must contain at least 6 characters'),
 ];
+
+export const validateForgotPassword = [
+  check('email').isEmail().withMessage('Must be a valid email address'),
+];
+
+export const validateResetPassword = [
+  check('email').isEmail().withMessage('Must be a valid email address'),
+  check('newPassword', 'New password is required').notEmpty(),
+  check('newPassword')
+    .isLength({
+      min: 6,
+    })
+    .withMessage('New password must contain at least 6 characters'),
+  check('code', 'Secret code is required').notEmpty(),
+  check('code')
+    .isLength({
+      min: 6,
+    })
+    .withMessage('Secret code must contain at least 6 characters'),
+];
