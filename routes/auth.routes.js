@@ -6,7 +6,7 @@ import {
   currentUser,
   forgotPassword,
   resetPassword,
-} from '../controllers/auth.controllers';
+} from '../controllers/auth.controller';
 import { requireSignIn } from '../middlewares';
 import {
   validateForgotPassword,
