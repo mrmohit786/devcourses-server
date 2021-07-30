@@ -26,7 +26,7 @@ mongoose
 
 // apply middleware
 app.use(cors());
-app.use(express.json()); // data available in JSON format
+app.use(express.json({ limit: '5mb' })); // data available in JSON format
 app.use(morgan('dev')); // api logger
 app.use(cookieParser());
 
