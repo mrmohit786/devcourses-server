@@ -1,5 +1,6 @@
 import User from '../models/user';
 import queryString from 'query-string';
+import Course from '../models/course';
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 export const makeInstructor = async (req, res) => {
@@ -75,6 +76,21 @@ export const currentInstructor = async (req, res) => {
     }
   } catch (error) {
     console.log('error currentInstructor controller ->', error);
+    return res.status(500).json({ error: 'Something went wrong' });
+  }
+};
+
+export const instructorCourses = async (req, res) => {
+  try {
+    const courses = await Course.find({ instructor: req.user._id })
+      .sort({
+        createdAt: -1,
+      })
+      .exec();
+
+    return res.status(200).json(courses);
+  } catch (error) {
+    console.log('error instructorCourses controller ->', error);
     return res.status(500).json({ error: 'Something went wrong' });
   }
 };
