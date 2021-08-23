@@ -1,12 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import { readdirSync } from 'fs';
-import mongoose from 'mongoose';
 import csrf from 'csurf';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 require('dotenv').config();
 
+import database from './config/database';
 import { httpLogger } from './logger';
 import { errorHandler, notFound } from './middlewares/errorHandler';
 
@@ -16,15 +16,7 @@ const csrfProtection = csrf({ cookie: true });
 const app = express();
 
 // connect database
-mongoose
-  .connect(process.env.DATABASE, {
-    useNewUrlParser: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  })
-  .then(() => console.log('#MongoDB connected'))
-  .catch((e) => console.log('Database connection error =>', e));
+database();
 
 // apply middleware
 app.use(cors());
