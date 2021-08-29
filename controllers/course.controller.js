@@ -21,10 +21,7 @@ export const uploadImage = async (req, res) => {
       return res.status(400).send('No image');
     }
 
-    const base64Data = new Buffer.from(
-      image.replace(/^data:image\/\w+;base64,/, ''),
-      'base64'
-    );
+    const base64Data = new Buffer.from(image.replace(/^data:image\/\w+;base64,/, ''), 'base64');
 
     const type = image.split(';')[0].split('/')[1];
 
@@ -217,6 +214,84 @@ export const addLesson = async (req, res) => {
     return res.status(200).json(updatedCourse);
   } catch (error) {
     console.log('createLesson controller ->', error);
+    return res.status(500).json({ error: 'Something went wrong' });
+  }
+};
+
+export const update = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const course = await Course.findOne({ slug }).exec();
+
+    if (!course) {
+      return res.status(400).send('No course found');
+    }
+
+    if (req.user._id !== course.instructor.toString()) {
+      return res.status(400).send('Unauthorized');
+    }
+
+    const updated = await Course.findOneAndUpdate({ slug }, req.body, { new: true }).exec();
+    res.json(updated);
+  } catch (error) {
+    console.log('update course controller ->', error);
+    return res.status(500).json({ error: 'Something went wrong' });
+  }
+};
+
+export const removeLesson = async (req, res) => {
+  try {
+    const { slug, lessonId } = req.params;
+    const course = await Course.findOne({ slug }).exec();
+
+    if (!course) {
+      return res.status(404).send('No course found');
+    }
+
+    if (req.user._id !== course.instructor.toString()) {
+      return res.status(400).send('Unauthorized');
+    }
+
+    const deleted = await Course.findByIdAndUpdate(course._id, {
+      $pull: { lessons: { _id: lessonId } },
+    }).exec();
+
+    res.json({ ok: true });
+  } catch (error) {
+    console.log('remove lesson controller ->', error);
+    return res.status(500).json({ error: 'Something went wrong' });
+  }
+};
+
+export const updateLesson = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { _id, title, content, video, free_preview } = req.body;
+    const course = await Course.findOne({ slug }).select('instructor').exec();
+    if (!course) {
+      return res.status(404).send('No course found');
+    }
+
+    if (req.user._id !== course.instructor.toString()) {
+      return res.status(400).send('Unauthorized');
+    }
+
+    const updated = await Course.updateOne(
+      { 'lessons._id': _id },
+      {
+        $set: {
+          'lessons.$.title': title,
+          'lessons.$.content': content,
+          'lessons.$.video': video,
+          'lessons.$.free_preview': free_preview,
+        },
+      },
+      { new: true }
+    ).exec();
+
+    res.json({ ok: true });
+  } catch (error) {
+    console.log('update lesson controller ->', error);
     return res.status(500).json({ error: 'Something went wrong' });
   }
 };
