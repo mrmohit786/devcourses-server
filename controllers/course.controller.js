@@ -295,3 +295,57 @@ export const updateLesson = async (req, res) => {
     return res.status(500).json({ error: 'Something went wrong' });
   }
 };
+
+export const publishCourse = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const course = await Course.findById(courseId).select('instructor').exec();
+    if (!course) {
+      return res.status(404).send('No course found');
+    }
+
+    if (req.user._id !== course.instructor.toString()) {
+      return res.status(400).send('Unauthorized');
+    }
+
+    const updatedCourse = await Course.findByIdAndUpdate(
+      courseId,
+      { published: true },
+      { new: true }
+    ).exec();
+    res.status(200).json(updatedCourse);
+  } catch (error) {
+    console.log('publish course controller ->', error);
+    return res.status(500).json({ error: 'Failed to publish course' });
+  }
+};
+
+export const unpublishCourse = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const course = await Course.findById(courseId).select('instructor').exec();
+    if (!course) {
+      return res.status(404).send('No course found');
+    }
+
+    if (req.user._id !== course.instructor.toString()) {
+      return res.status(400).send('Unauthorized');
+    }
+
+    const updatedCourse = await Course.findByIdAndUpdate(
+      courseId,
+      { published: false },
+      { new: true }
+    ).exec();
+
+    res.status(200).json(updatedCourse);
+  } catch (error) {
+    console.log('unpublish course controller ->', error);
+    return res.status(500).json({ error: 'Failed to unpublish course' });
+  }
+};
+
+export const list = async (req, res) => {
+  const all = await Course.find({ published: true }).populate('instructor', '_id name').exec();
+  res.json(all);
+};

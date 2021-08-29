@@ -6,12 +6,15 @@ import {
   removeImage,
   uploadVideo,
   removeVideo,
+  list,
   create,
   read,
   addLesson,
   update,
   removeLesson,
   updateLesson,
+  publishCourse,
+  unpublishCourse,
 } from '../controllers/course.controller';
 const router = express.Router();
 import { isInstructor, requireSignIn } from '../middlewares';
@@ -22,6 +25,7 @@ router.post('/course/remove-image', requireSignIn, removeImage);
 
 // course
 router.post('/course', requireSignIn, isInstructor, create);
+router.get('/course', list);
 router.put('/course/:slug', requireSignIn, update);
 router.get('/course/:slug', read);
 
@@ -29,7 +33,13 @@ router.get('/course/:slug', read);
 router.post('/course/upload-video/:instructorId', requireSignIn, formidable(), uploadVideo);
 router.post('/course/remove-video/:instructorId', requireSignIn, removeVideo);
 
+// publish/unpublish
+router.put('/course/publish/:courseId', requireSignIn, publishCourse);
+router.put('/course/unpublish/:courseId', requireSignIn, unpublishCourse);
+
+// lessons
 router.post('/course/lesson/:slug/:instructorId', requireSignIn, addLesson);
 router.put('/course/lesson/:slug', requireSignIn, updateLesson);
 router.put('/course/:slug/:lessonId', requireSignIn, removeLesson);
+
 module.exports = router;

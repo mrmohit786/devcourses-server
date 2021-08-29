@@ -1,4 +1,4 @@
-import { logger } from "../logger";
+import { logger } from '../logger';
 
 export const notFound = (req, res, next) => {
   const error = new Error(`Not Found - ${req.originalUrl}`);
@@ -13,6 +13,5 @@ export const errorHandler = (err, req, res, next) => {
   logger.error(err.message);
   res.json({
     message: err.message,
-    stack: err.stack,
   });
 };
