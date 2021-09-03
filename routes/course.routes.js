@@ -17,6 +17,8 @@ import {
   unpublishCourse,
   checkEnrollment,
   freeEnrollment,
+  paidEnrollment,
+  stripeSuccess,
 } from '../controllers/course.controller';
 const router = express.Router();
 import { isInstructor, requireSignIn } from '../middlewares';
@@ -48,5 +50,7 @@ router.get('/check-enrollment/:courseId', requireSignIn, checkEnrollment);
 
 // enrollment
 router.post('/free-enrollment/:courseId', requireSignIn, freeEnrollment);
+router.post('/paid-enrollment/:courseId', requireSignIn, paidEnrollment);
+router.get('/stripe-success/:courseId', requireSignIn, stripeSuccess);
 
 module.exports = router;
