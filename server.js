@@ -7,8 +7,8 @@ import compression from 'compression';
 require('dotenv').config();
 
 import database from './config/database';
-import { httpLogger } from './logger';
 import { errorHandler, notFound } from './middlewares/errorHandler';
+import { morganLogger } from './utils/logger';
 
 const csrfProtection = csrf({ cookie: true });
 
@@ -22,7 +22,7 @@ database();
 app.use(cors());
 app.use(express.json({ limit: '5mb' })); // data available in JSON format
 app.use(compression());
-app.use(httpLogger); // api logger
+app.use(morganLogger); // api logger
 app.use(cookieParser());
 
 // auto load routes

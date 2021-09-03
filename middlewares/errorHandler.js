@@ -1,8 +1,8 @@
-import { logger } from '../logger';
+import { logger } from "../utils/logger";
 
 export const notFound = (req, res, next) => {
   const error = new Error(`Not Found - ${req.originalUrl}`);
-  logger.info(error);
+  logger.warn(error);
   res.status(404);
   next(error);
 };
