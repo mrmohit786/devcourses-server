@@ -19,9 +19,13 @@ import {
   freeEnrollment,
   paidEnrollment,
   stripeSuccess,
+  userCourses,
+  markComplete,
+  listComplete,
+  markIncomplete
 } from '../controllers/course.controller';
 const router = express.Router();
-import { isInstructor, requireSignIn } from '../middlewares';
+import { isEnrolled, isInstructor, requireSignIn } from '../middlewares';
 
 // image
 router.post('/course/upload-image', requireSignIn, uploadImage);
@@ -52,5 +56,15 @@ router.get('/check-enrollment/:courseId', requireSignIn, checkEnrollment);
 router.post('/free-enrollment/:courseId', requireSignIn, freeEnrollment);
 router.post('/paid-enrollment/:courseId', requireSignIn, paidEnrollment);
 router.get('/stripe-success/:courseId', requireSignIn, stripeSuccess);
+
+// user courses
+router.get('/user-courses', requireSignIn, userCourses);
+router.get('/user/course/:slug', requireSignIn, isEnrolled, read);
+
+// mark as completed
+router.post('/mark-complete', requireSignIn, markComplete);
+router.post('/mark-incomplete', requireSignIn, markIncomplete);
+
+router.post('/list-complete', requireSignIn, listComplete);
 
 module.exports = router;

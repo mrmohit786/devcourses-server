@@ -1,6 +1,7 @@
 import AWS from 'aws-sdk';
 import { nanoid } from 'nanoid';
 import Course from '../models/course';
+import Completed from '../models/completed';
 import slugify from 'slugify';
 import { readFileSync } from 'fs';
 import User from '../models/user';
@@ -465,6 +466,82 @@ export const stripeSuccess = async (req, res) => {
     res.status(200).json({ success: true, course });
   } catch (error) {
     console.log('stripeSuccess err', error);
+    return res.status(400).json({ success: false });
+  }
+};
+
+export const userCourses = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).exec();
+    const courses = await Course.find({ _id: { $in: user.courses } })
+      .populate('instructor', '_id name')
+      .exec();
+    res.status(200).json(courses);
+  } catch (error) {
+    console.log('userCourses err', error);
+    return res.status(400).json({ success: false });
+  }
+};
+
+export const markComplete = async (req, res) => {
+  try {
+    const { courseId, lessonId } = req.body;
+    const existing = await Completed.findOne({
+      user: req.user._id,
+      course: courseId,
+    });
+
+    if (existing) {
+      const updated = await Completed.findOneAndUpdate(
+        {
+          user: req.user._id,
+          course: courseId,
+        },
+        { $addToSet: { lessons: lessonId } }
+      ).exec();
+      return res.json({ ok: true });
+    } else {
+      const created = await new Completed({
+        user: req.user._id,
+        course: courseId,
+        lessons: lessonId,
+      }).save();
+      return res.json({ ok: true });
+    }
+  } catch (error) {
+    console.log('markCompleted err', error);
+    return res.status(400).json({ success: false });
+  }
+};
+
+export const listComplete = async (req, res) => {
+  try {
+    const list = await Completed.findOne({
+      user: req.user._id,
+      course: req.body.courseId,
+    }).exec();
+    if (list) {
+      return res.json(list.lessons);
+    }
+  } catch (error) {
+    console.log('listComplete err', error);
+    return res.status(400).json({ success: false });
+  }
+};
+
+export const markIncomplete = async (req, res) => {
+  try {
+    const { courseId, lessonId } = req.body;
+    const update = await Completed.findOneAndUpdate(
+      {
+        user: req.user._id,
+        course: courseId,
+      },
+      { $pull: { lessons: lessonId } }
+    );
+    res.json({ ok: true });
+  } catch (error) {
+    console.log('markIncomplete err', error);
     return res.status(400).json({ success: false });
   }
 };
