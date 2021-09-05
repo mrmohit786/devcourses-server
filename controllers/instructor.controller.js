@@ -32,7 +32,7 @@ export const makeInstructor = async (req, res) => {
       'stripe_user[email]': user.email,
     });
 
-    res
+    return res
       .status(200)
       .send(`${accountLink.url}?${queryString.stringify(accountLink)}`);
   } catch (error) {
@@ -58,7 +58,7 @@ export const getAccountStatus = async (req, res) => {
     )
       .select('-password')
       .exec();
-    res.status(200).json(statusUpdated);
+    return res.status(200).json(statusUpdated);
   } catch (error) {
     console.log('error getAccountStatus controller ->', error);
     return res.status(500).json({ error: 'Something went wrong' });
@@ -90,6 +90,46 @@ export const instructorCourses = async (req, res) => {
     return res.status(200).json(courses);
   } catch (error) {
     console.log('error instructorCourses controller ->', error);
+    return res.status(500).json({ error: 'Something went wrong' });
+  }
+};
+
+export const studentCount = async (req, res) => {
+  try {
+    const users = await User.find({ courses: req.body.courseId })
+      .select('_id')
+      .exec();
+
+    return res.status(200).json({ length: users.length });
+  } catch (error) {
+    console.log('error studentCount controller ->', error);
+    return res.status(500).json({ error: 'Something went wrong' });
+  }
+};
+
+export const instructorBalance = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).exec();
+    const balance = await stripe.balance.retrieve({
+      stripeAccount: user.stripe_account_id,
+    });
+    res.json(balance);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Something went wrong' });
+  }
+};
+
+export const instructorPayoutSettings = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).exec();
+    const loginLink = await stripe.accounts.createLoginLink(
+      user.stripe_seller.id,
+      { redirect_url: process.env.STRIPE_SETTINGS_REDIRECT },
+    );
+    return res.json(loginLink.url);
+  } catch (err) {
+    console.log('stripe payout settings login link err =>', err);
     return res.status(500).json({ error: 'Something went wrong' });
   }
 };
