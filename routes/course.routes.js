@@ -22,10 +22,11 @@ import {
   userCourses,
   markComplete,
   listComplete,
-  markIncomplete
+  markIncomplete,
 } from '../controllers/course.controller';
-const router = express.Router();
 import { isEnrolled, isInstructor, requireSignIn } from '../middlewares';
+
+const router = express.Router();
 
 // image
 router.post('/course/upload-image', requireSignIn, uploadImage);

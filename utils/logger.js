@@ -31,7 +31,6 @@ export const logger = winston.createLogger({
   exitOnError: false,
 });
 
-
 // winston options for api logging
 const infoOptions = {
   file: {
@@ -69,7 +68,9 @@ const format = json({
 export const morganLogger = morgan(format, {
   stream: {
     write: (message) => {
-      const { method, url, status, responseTime } = JSON.parse(message);
+      const {
+        method, url, status, responseTime,
+      } = JSON.parse(message);
       apiLogger.info({
         timestamp: moment().format('MMMM Do YYYY, h:mm:ss a'),
         method,

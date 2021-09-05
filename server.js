@@ -4,11 +4,12 @@ import { readdirSync } from 'fs';
 import csrf from 'csurf';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
-require('dotenv').config();
 
 import database from './config/database';
 import { errorHandler, notFound } from './middlewares/errorHandler';
 import { morganLogger } from './utils/logger';
+
+require('dotenv').config();
 
 const csrfProtection = csrf({ cookie: true });
 
@@ -28,7 +29,7 @@ app.use(cookieParser());
 // auto load routes
 readdirSync('./routes').map((route) => app.use('/api', require(`./routes/${route}`)));
 
-//csrf
+// csrf
 app.use(csrfProtection);
 
 app.get('/api/csrf-token', (req, res) => {
@@ -39,6 +40,4 @@ app.use(notFound);
 app.use(errorHandler);
 
 // listen
-app.listen(process.env.PORT, () =>
-  console.log(`#Server running in ${process.env.NODE_ENV} mode on PORT ${process.env.PORT}`)
-);
+app.listen(process.env.PORT, () => console.log(`#Server running in ${process.env.NODE_ENV} mode on PORT ${process.env.PORT}`));

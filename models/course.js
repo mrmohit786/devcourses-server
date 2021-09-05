@@ -25,7 +25,7 @@ const lessonSchema = new Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const courseSchema = new Schema(
@@ -68,7 +68,7 @@ const courseSchema = new Schema(
     },
     lessons: [lessonSchema],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default model('Course', courseSchema);

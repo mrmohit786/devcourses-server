@@ -1,4 +1,5 @@
-import { logger } from "../utils/logger";
+import { logger } from '../utils/logger';
+
 export const notFound = (req, res, next) => {
   const error = new Error(`API Not Found - ${process.env.SERVER_API}${req.originalUrl}`);
   logger.warn(error);
@@ -12,6 +13,6 @@ export const errorHandler = (err, req, res, next) => {
   logger.error(err.message);
   res.status(statusCode).json({
     message: err.message,
-    statusCode: statusCode
+    statusCode,
   });
 };

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+
 const { ObjectId } = mongoose.Schema;
 
 const completedSchema = new mongoose.Schema(
@@ -13,7 +14,7 @@ const completedSchema = new mongoose.Schema(
     },
     lessons: [],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model('Completed', completedSchema);

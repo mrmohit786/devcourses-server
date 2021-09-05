@@ -13,9 +13,8 @@ export const isInstructor = async (req, res, next) => {
     const user = await User.findById(req.user._id).exec();
     if (!user.role.includes('Instructor')) {
       return res.sendStatus(403);
-    } else {
-      next();
     }
+    next();
   } catch (error) {
     console.log(error);
   }
@@ -27,7 +26,7 @@ export const isEnrolled = async (req, res, next) => {
     const course = await Course.findOne({ slug: req.params.slug }).exec();
 
     // check if course id is found in user courses array
-    let ids = [];
+    const ids = [];
     for (let i = 0; i < user.courses.length; i++) {
       ids.push(user.courses[i].toString());
     }

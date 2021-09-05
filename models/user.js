@@ -15,7 +15,7 @@ const userSchema = new Schema(
       trim: true,
       required: true,
       unique: true,
-      lowercase: true
+      lowercase: true,
     },
     password: {
       type: String,
@@ -39,9 +39,9 @@ const userSchema = new Schema(
       data: String,
       default: '',
     },
-    courses: [{ type: ObjectId, ref: "Course" }],
+    courses: [{ type: ObjectId, ref: 'Course' }],
   },
-  { timeStamps: true }
+  { timeStamps: true },
 );
 
 export default mongoose.model('User', userSchema);

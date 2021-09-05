@@ -1,11 +1,12 @@
 import AWS from 'aws-sdk';
 import { nanoid } from 'nanoid';
-import Course from '../models/course';
-import Completed from '../models/completed';
 import slugify from 'slugify';
 import { readFileSync } from 'fs';
+import Course from '../models/course';
+import Completed from '../models/completed';
 import User from '../models/user';
 import { logger } from '../utils/logger';
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const awsConfig = {
@@ -80,7 +81,9 @@ export const removeImage = async (req, res) => {
 
 export const create = async (req, res) => {
   try {
-    const { image, name, description, category, paid, price } = req.body;
+    const {
+      image, name, description, category, paid, price,
+    } = req.body;
     const alreadyExist = await Course.findOne({
       slug: slugify(name.toLowerCase()),
     });
@@ -210,7 +213,7 @@ export const addLesson = async (req, res) => {
           },
         },
       },
-      { new: true }
+      { new: true },
     )
       .populate('instructor', '_id name')
       .exec();
@@ -270,7 +273,9 @@ export const removeLesson = async (req, res) => {
 export const updateLesson = async (req, res) => {
   try {
     const { slug } = req.params;
-    const { _id, title, content, video, free_preview } = req.body;
+    const {
+      _id, title, content, video, free_preview,
+    } = req.body;
     const course = await Course.findOne({ slug }).select('instructor').exec();
     if (!course) {
       return res.status(404).send('No course found');
@@ -290,7 +295,7 @@ export const updateLesson = async (req, res) => {
           'lessons.$.free_preview': free_preview,
         },
       },
-      { new: true }
+      { new: true },
     ).exec();
 
     res.json({ ok: true });
@@ -315,7 +320,7 @@ export const publishCourse = async (req, res) => {
     const updatedCourse = await Course.findByIdAndUpdate(
       courseId,
       { published: true },
-      { new: true }
+      { new: true },
     ).exec();
     res.status(200).json(updatedCourse);
   } catch (error) {
@@ -339,7 +344,7 @@ export const unpublishCourse = async (req, res) => {
     const updatedCourse = await Course.findByIdAndUpdate(
       courseId,
       { published: false },
-      { new: true }
+      { new: true },
     ).exec();
 
     res.status(200).json(updatedCourse);
@@ -359,8 +364,8 @@ export const checkEnrollment = async (req, res) => {
   // find courses of the currently logged in user
   const user = await User.findById(req.user._id).exec();
   // check if course id is found in user courses array
-  let ids = [];
-  let length = user.courses && user.courses.length;
+  const ids = [];
+  const length = user.courses && user.courses.length;
   for (let i = 0; i < length; i++) {
     ids.push(user.courses[i].toString());
   }
@@ -381,7 +386,7 @@ export const freeEnrollment = async (req, res) => {
       {
         $addToSet: { courses: course._id },
       },
-      { new: true }
+      { new: true },
     ).exec();
     console.log(result);
     res.json({
@@ -497,17 +502,16 @@ export const markComplete = async (req, res) => {
           user: req.user._id,
           course: courseId,
         },
-        { $addToSet: { lessons: lessonId } }
+        { $addToSet: { lessons: lessonId } },
       ).exec();
       return res.json({ ok: true });
-    } else {
-      const created = await new Completed({
-        user: req.user._id,
-        course: courseId,
-        lessons: lessonId,
-      }).save();
-      return res.json({ ok: true });
     }
+    const created = await new Completed({
+      user: req.user._id,
+      course: courseId,
+      lessons: lessonId,
+    }).save();
+    return res.json({ ok: true });
   } catch (error) {
     console.log('markCompleted err', error);
     return res.status(400).json({ success: false });
@@ -537,7 +541,7 @@ export const markIncomplete = async (req, res) => {
         user: req.user._id,
         course: courseId,
       },
-      { $pull: { lessons: lessonId } }
+      { $pull: { lessons: lessonId } },
     );
     res.json({ ok: true });
   } catch (error) {

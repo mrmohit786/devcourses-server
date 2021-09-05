@@ -1,6 +1,7 @@
-import User from '../models/user';
 import queryString from 'query-string';
+import User from '../models/user';
 import Course from '../models/course';
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 export const makeInstructor = async (req, res) => {
@@ -46,19 +47,18 @@ export const getAccountStatus = async (req, res) => {
     const account = await stripe.accounts.retrieve(user.stripe_account_id);
     if (!account.charges_enabled) {
       return res.status(401).send('Unauthorized');
-    } else {
-      const statusUpdated = await User.findByIdAndUpdate(
-        user._id,
-        {
-          stripe_seller: account,
-          $addToSet: { role: 'Instructor' },
-        },
-        { new: true }
-      )
-        .select('-password')
-        .exec();
-      res.status(200).json(statusUpdated);
     }
+    const statusUpdated = await User.findByIdAndUpdate(
+      user._id,
+      {
+        stripe_seller: account,
+        $addToSet: { role: 'Instructor' },
+      },
+      { new: true },
+    )
+      .select('-password')
+      .exec();
+    res.status(200).json(statusUpdated);
   } catch (error) {
     console.log('error getAccountStatus controller ->', error);
     return res.status(500).json({ error: 'Something went wrong' });
@@ -71,9 +71,8 @@ export const currentInstructor = async (req, res) => {
 
     if (!user.role.includes('Instructor')) {
       return res.sendStatus(403);
-    } else {
-      return res.status(200).json({ ok: true });
     }
+    return res.status(200).json({ ok: true });
   } catch (error) {
     console.log('error currentInstructor controller ->', error);
     return res.status(500).json({ error: 'Something went wrong' });

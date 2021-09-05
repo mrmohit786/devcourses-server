@@ -1,9 +1,9 @@
 import { validationResult } from 'express-validator';
-import User from '../models/user';
-import { hashPassword, comparePassword } from '../utils/auth';
 import jwt from 'jsonwebtoken';
 import AWS from 'aws-sdk';
 import { nanoid } from 'nanoid';
+import { hashPassword, comparePassword } from '../utils/auth';
+import User from '../models/user';
 
 const awsConfig = {
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -18,9 +18,9 @@ export const register = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = errors.array().map(error => error.msg)[0];
+      const error = errors.array().map((error) => error.msg)[0];
       return res.status(422).json({
-        error: error,
+        error,
       });
     }
 
@@ -46,9 +46,9 @@ export const login = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = errors.array().map(error => error.msg)[0];
+      const error = errors.array().map((error) => error.msg)[0];
       return res.status(422).json({
-        error: error,
+        error,
       });
     }
 
@@ -100,9 +100,9 @@ export const forgotPassword = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = errors.array().map(error => error.msg)[0];
+      const error = errors.array().map((error) => error.msg)[0];
       return res.status(422).json({
-        error: error,
+        error,
       });
     }
 
@@ -110,7 +110,7 @@ export const forgotPassword = async (req, res) => {
     const shortCode = nanoid(6).toUpperCase();
     const user = await User.findOneAndUpdate(
       { email },
-      { passwordResetCode: shortCode }
+      { passwordResetCode: shortCode },
     );
 
     if (!user) return res.status(400).json({ error: 'User not found' });
@@ -145,11 +145,11 @@ export const forgotPassword = async (req, res) => {
     const emailSent = SES.sendEmail(params).promise();
 
     emailSent
-      .then(data => {
+      .then((data) => {
         console.log(data);
         res.status(200).json({ ok: true });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
         res.status(400).json({ error: error.message });
       });
@@ -163,9 +163,9 @@ export const resetPassword = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const error = errors.array().map(error => error.msg)[0];
+      const error = errors.array().map((error) => error.msg)[0];
       return res.status(422).json({
-        error: error,
+        error,
       });
     }
     const { email, code, newPassword } = req.body;
@@ -173,10 +173,10 @@ export const resetPassword = async (req, res) => {
 
     await User.findOneAndUpdate(
       { email, passwordResetCode: code },
-      { password: hashedPassword, passwordResetCode: '' }
+      { password: hashedPassword, passwordResetCode: '' },
     ).exec();
 
-    res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true });
   } catch (error) {
     console.log('resetPassword controller ->', error);
     return res.status(500).json({ error: 'Something went wrong' });
